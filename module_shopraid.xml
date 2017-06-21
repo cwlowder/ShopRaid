@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_shopraid" default="compile.module.shopraid">
+  <dirname property="module.shopraid.basedir" file="${ant.file.module_shopraid}"/>
+  
+  <property name="module.jdk.home.shopraid" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.shopraid" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.shopraid" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.shopraid" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="shopraid.output.dir" value="${module.shopraid.basedir}/out/production/ShopRaid"/>
+  <property name="shopraid.testoutput.dir" value="${module.shopraid.basedir}/out/test/ShopRaid"/>
+  
+  <path id="shopraid.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="shopraid.module.production.classpath">
+    <path refid="${module.jdk.classpath.shopraid}"/>
+  </path>
+  
+  <path id="shopraid.runtime.production.module.classpath">
+    <pathelement location="${shopraid.output.dir}"/>
+  </path>
+  
+  <path id="shopraid.module.classpath">
+    <path refid="${module.jdk.classpath.shopraid}"/>
+    <pathelement location="${shopraid.output.dir}"/>
+  </path>
+  
+  <path id="shopraid.runtime.module.classpath">
+    <pathelement location="${shopraid.testoutput.dir}"/>
+    <pathelement location="${shopraid.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.shopraid">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.shopraid">
+    <patternset refid="excluded.from.module.shopraid"/>
+  </patternset>
+  
+  <path id="shopraid.module.sourcepath">
+    <dirset dir="${module.shopraid.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.shopraid" depends="compile.module.shopraid.production,compile.module.shopraid.tests" description="Compile module ShopRaid"/>
+  
+  <target name="compile.module.shopraid.production" depends="register.custom.compilers" description="Compile module ShopRaid; production classes">
+    <mkdir dir="${shopraid.output.dir}"/>
+    <javac2 destdir="${shopraid.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.shopraid}/javac">
+      <compilerarg line="${compiler.args.shopraid}"/>
+      <bootclasspath refid="shopraid.module.bootclasspath"/>
+      <classpath refid="shopraid.module.production.classpath"/>
+      <src refid="shopraid.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.shopraid"/>
+    </javac2>
+    
+    <copy todir="${shopraid.output.dir}">
+      <fileset dir="${module.shopraid.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.shopraid.tests" depends="register.custom.compilers,compile.module.shopraid.production" description="compile module ShopRaid; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.shopraid" description="cleanup module">
+    <delete dir="${shopraid.output.dir}"/>
+    <delete dir="${shopraid.testoutput.dir}"/>
+  </target>
+</project>
